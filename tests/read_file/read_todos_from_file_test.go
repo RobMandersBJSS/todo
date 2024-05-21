@@ -2,8 +2,9 @@ package todos_test
 
 import (
 	"testing"
-	"todo"
+	"todo/read_file"
 	"todo/tests/helpers"
+	"todo/todo"
 )
 
 func TestReadTodosFromFile(t *testing.T) {
@@ -13,7 +14,7 @@ func TestReadTodosFromFile(t *testing.T) {
 		tempFile, closeFile := helpers.CreateTempFile(t, "todos", contents)
 		defer closeFile()
 
-		actual, err := todo.ReadTodosFromFile(tempFile.Name())
+		actual, err := read_file.ReadTodosFromFile(tempFile.Name())
 		helpers.AssertNoError(t, err)
 
 		expected := []todo.Todo{
@@ -25,7 +26,7 @@ func TestReadTodosFromFile(t *testing.T) {
 	})
 
 	t.Run("Returns error if bad file path supplied", func(t *testing.T) {
-		_, err := todo.ReadTodosFromFile("bad_file")
+		_, err := read_file.ReadTodosFromFile("bad_file")
 
 		helpers.AssertError(t, err)
 	})
@@ -36,7 +37,7 @@ func TestReadTodosFromFile(t *testing.T) {
 		tempFile, closeFile := helpers.CreateTempFile(t, "bad_file", contents)
 		defer closeFile()
 
-		_, err := todo.ReadTodosFromFile(tempFile.Name())
+		_, err := read_file.ReadTodosFromFile(tempFile.Name())
 
 		helpers.AssertError(t, err)
 	})

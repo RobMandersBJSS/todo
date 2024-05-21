@@ -1,4 +1,4 @@
-package todo
+package read_file
 
 import (
 	"encoding/json"
@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"todo/todo"
 )
 
-func ReadTodosFromFile(fileName string) ([]Todo, error) {
+func ReadTodosFromFile(fileName string) ([]todo.Todo, error) {
 	file, readFileError := os.Open(fileName)
 	if readFileError != nil {
 		message := fmt.Sprintf("error when reading file from %q: %v", fileName, readFileError)
@@ -22,7 +23,7 @@ func ReadTodosFromFile(fileName string) ([]Todo, error) {
 		return nil, errors.New(message)
 	}
 
-	var todos []Todo
+	var todos []todo.Todo
 
 	unmarshalError := json.Unmarshal(bytes, &todos)
 	if unmarshalError != nil {

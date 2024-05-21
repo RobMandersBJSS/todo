@@ -1,18 +1,14 @@
-package todo
+package print
 
 import (
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
+	"todo/todo"
 )
 
-type Todo struct {
-	Item   string `json:"Item"`
-	Status bool   `json:"Status"`
-}
-
-func PrintTodos(w io.Writer, todos ...Todo) error {
+func PrintTodos(w io.Writer, todos ...todo.Todo) error {
 	if len(todos) < 1 {
 		return errors.New("no todos provided in argument")
 	}
@@ -29,7 +25,7 @@ func PrintTodos(w io.Writer, todos ...Todo) error {
 	return nil
 }
 
-func PrintTodosJSON(w io.Writer, todos ...Todo) error {
+func PrintTodosJSON(w io.Writer, todos ...todo.Todo) error {
 	if len(todos) < 1 {
 		return errors.New("no todos provided in argument")
 	}

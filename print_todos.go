@@ -29,8 +29,13 @@ func PrintTodos(w io.Writer, todos ...Todo) error {
 	return nil
 }
 
-func PrintTodosJSON(w io.Writer, todos ...Todo) {
-	output, _ := json.Marshal(todos)
+func PrintTodosJSON(w io.Writer, todos ...Todo) error {
+	if len(todos) < 1 {
+		return errors.New("no todos provided in argument")
+	}
 
+	output, _ := json.Marshal(todos)
 	fmt.Fprint(w, string(output))
+
+	return nil
 }

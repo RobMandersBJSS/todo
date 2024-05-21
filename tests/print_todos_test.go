@@ -42,11 +42,21 @@ func TestPrintTodosJSON(t *testing.T) {
 			{Item: "Item 2", Status: true},
 		}
 
-		todo.PrintTodosJSON(buffer, todos...)
+		err := todo.PrintTodosJSON(buffer, todos...)
+		helpers.AssertNoError(t, err)
 
 		actual := buffer.String()
 		expected := "[{\"Item\":\"Item 1\",\"Status\":false},{\"Item\":\"Item 2\",\"Status\":true}]"
 
 		helpers.AssertEqual(t, actual, expected)
+	})
+
+	t.Run("Return an error if no todos provided", func(t *testing.T) {
+		buffer := &bytes.Buffer{}
+		todos := []todo.Todo{}
+
+		err := todo.PrintTodosJSON(buffer, todos...)
+
+		helpers.AssertError(t, err)
 	})
 }

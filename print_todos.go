@@ -8,7 +8,7 @@ import (
 )
 
 type Todo struct {
-	Item   string `json:"Item`
+	Item   string `json:"Item"`
 	Status bool   `json:"Status"`
 }
 

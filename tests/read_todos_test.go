@@ -1,7 +1,6 @@
 package todos_test
 
 import (
-	"reflect"
 	"testing"
 	"todo"
 	"todo/tests/helpers"
@@ -22,9 +21,7 @@ func TestReadTodosFromFile(t *testing.T) {
 			{Item: "Item 2", Status: true},
 		}
 
-		if !reflect.DeepEqual(actual, expected) {
-			t.Errorf("Got %+v, expected %+v", actual, expected)
-		}
+		helpers.AssertSliceEqual(t, actual, expected)
 	})
 
 	t.Run("Returns error if bad file path supplied", func(t *testing.T) {

@@ -3,7 +3,7 @@
 [X] Use a variadic function to print a list of 10 todos.
 [X] Output a list of 10 todos in JSON format.
 [X] Use a variadic function to output 10 todos in JSON format.
-[ ] Read todos from a JSON file.
+[X] Read todos from a JSON file.
 [ ] Create console program to read 10 todos from a JSON file and display them on screen.
 [ ] Simulate a race condition... 
     [ ] When one Goroutine updates a variable with odd numbers.

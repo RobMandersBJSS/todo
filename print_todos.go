@@ -8,8 +8,8 @@ import (
 )
 
 type Todo struct {
-	Item   string
-	Status bool
+	Item   string `json:"Item`
+	Status bool   `json:"Status"`
 }
 
 func PrintTodos(w io.Writer, todos ...Todo) error {

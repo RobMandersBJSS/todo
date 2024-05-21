@@ -4,7 +4,7 @@
 [X] Output a list of 10 todos in JSON format.
 [X] Use a variadic function to output 10 todos in JSON format.
 [X] Read todos from a JSON file.
-[ ] Create console program to read 10 todos from a JSON file and display them on screen.
+[X] Create console program to read 10 todos from a JSON file and display them on screen.
 [ ] Simulate a race condition... 
     [ ] When one Goroutine updates a variable with odd numbers.
     [ ] And another Goroutine updates the variable with even numbers.

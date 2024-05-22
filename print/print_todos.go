@@ -19,7 +19,7 @@ func PrintTodos(w io.Writer, todos ...store.Todo) error {
 			status = "Complete"
 		}
 
-		fmt.Fprintf(w, "%s - %s\n", todo.Item, status)
+		fmt.Fprintf(w, "%s - %s\n", todo.Description, status)
 	}
 
 	return nil

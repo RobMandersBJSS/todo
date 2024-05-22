@@ -12,8 +12,8 @@ func TestPrintTodos(t *testing.T) {
 	t.Run("Print todos with statuses", func(t *testing.T) {
 		buffer := &bytes.Buffer{}
 		todos := []store.Todo{
-			{ID: 0, Item: "Item 1", Complete: false},
-			{ID: 1, Item: "Item 2", Complete: true},
+			{ID: "0", Description: "Item 1", Complete: false},
+			{ID: "1", Description: "Item 2", Complete: true},
 		}
 
 		err := print.PrintTodos(buffer, todos...)

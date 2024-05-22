@@ -14,9 +14,9 @@
 
 # Part 2
 
-[ ] Create CLI app to manage todo list stored in memory. Create, Read, Update, Delete.
+[X] Create CLI app to manage todo list stored in memory. Create, Read, Update, Delete.
 [ ] Create web page app to manage todo list stores in memory.
-[ ] Create server that can concurrently receive a list or pre[ ]defined commands. The following should be avaiable via specific commands:
+[ ] Create server that can concurrently receive a list or pre-defined commands. The following should be avaiable via specific commands:
     [ ] Server status.
     [ ] Task status.
 [ ] Create a web API to receive web page actions (remote commands) applied to todo list.

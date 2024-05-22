@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"todo/print"
-	"todo/store"
+	"todo/modules/print"
+	"todo/modules/store"
 )
 
 func main() {
@@ -35,7 +35,7 @@ func main() {
 		case "update":
 			updateItem(&todos, inputString)
 		case "toggle":
-			updateItemStatus(&todos, inputString)
+			updateStatus(&todos, inputString)
 		case "exit":
 			running = false
 		default:
@@ -84,7 +84,7 @@ func updateItem(todos *store.TodoStore, inputString string) {
 	}
 }
 
-func updateItemStatus(todos *store.TodoStore, inputString string) {
+func updateStatus(todos *store.TodoStore, inputString string) {
 	id := inputString[7:]
 	err := todos.ToggleItemStatus(id)
 	if err != nil {

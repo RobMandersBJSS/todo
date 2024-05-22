@@ -2,8 +2,8 @@ package todos_test
 
 import (
 	"testing"
-	"todo/read_file"
-	"todo/store"
+	"todo/modules/read_file"
+	"todo/modules/store"
 	"todo/tests/helpers"
 )
 

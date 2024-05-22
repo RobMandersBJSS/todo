@@ -3,8 +3,8 @@ package print_test
 import (
 	"bytes"
 	"testing"
-	"todo/print"
-	"todo/store"
+	"todo/modules/print"
+	"todo/modules/store"
 	"todo/tests/helpers"
 )
 

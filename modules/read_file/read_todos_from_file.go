@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"todo/store"
+	"todo/modules/store"
 )
 
 func ReadTodosFromFile(fileName string) ([]store.Todo, error) {

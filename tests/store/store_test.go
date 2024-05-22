@@ -2,7 +2,7 @@ package store_test
 
 import (
 	"testing"
-	"todo/store"
+	"todo/modules/store"
 	"todo/tests/helpers"
 )
 

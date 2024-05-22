@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"todo/store"
+	"todo/modules/store"
 )
 
 const NoItemsMessage = "No items in list."

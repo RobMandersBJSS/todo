@@ -152,3 +152,33 @@ func TestToggleItemStatus(t *testing.T) {
 		helpers.AssertError(t, err)
 	})
 }
+
+func TestDelete(t *testing.T) {
+	t.Run("Delete item", func(t *testing.T) {
+		todos := []store.Todo{
+			{ID: "0", Description: "Description 1", Complete: false},
+			{ID: "1", Description: "Description 2", Complete: true},
+		}
+		todoStore := store.TodoStore{Items: todos}
+
+		err := todoStore.Delete("0")
+		helpers.AssertNoError(t, err)
+
+		expected := []store.Todo{
+			{ID: "1", Description: "Description 2", Complete: true},
+		}
+
+		helpers.AssertStructEqual(t, todoStore.Items, expected)
+	})
+
+	t.Run("Return an error if ID cannot be found", func(t *testing.T) {
+		todos := []store.Todo{
+			{ID: "0", Description: "Description 1", Complete: false},
+			{ID: "1", Description: "Description 2", Complete: true},
+		}
+		todoStore := store.TodoStore{Items: todos}
+
+		err := todoStore.Delete("10")
+		helpers.AssertError(t, err)
+	})
+}

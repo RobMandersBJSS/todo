@@ -8,18 +8,24 @@ import (
 	"todo/store"
 )
 
-func PrintTodos(w io.Writer, todos ...store.Todo) error {
-	if len(todos) < 1 {
-		return errors.New("no todos provided in argument")
+const NoItemsMessage = "No items in list."
+
+func PrintTodo(w io.Writer, item store.Todo) {
+	status := "Incomplete"
+	if item.Complete {
+		status = "Complete  "
 	}
 
-	for _, todo := range todos {
-		status := "Incomplete"
-		if todo.Complete {
-			status = "Complete"
-		}
+	fmt.Fprintf(w, "%s %s %s\n", item.ID, status, item.Description)
+}
 
-		fmt.Fprintf(w, "%s - %s\n", todo.Description, status)
+func PrintTodos(w io.Writer, todos ...store.Todo) error {
+	if len(todos) < 1 {
+		fmt.Fprint(w, NoItemsMessage)
+	}
+
+	for _, item := range todos {
+		PrintTodo(w, item)
 	}
 
 	return nil

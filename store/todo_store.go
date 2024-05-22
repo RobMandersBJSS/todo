@@ -75,6 +75,17 @@ func (t *TodoStore) ToggleItemStatus(id string) error {
 	return nil
 }
 
+func (t *TodoStore) Delete(id string) error {
+	index, _, err := t.findItem(id)
+	if err != nil {
+		return err
+	}
+
+	t.Items = append(t.Items[:index], t.Items[index+1:]...)
+
+	return nil
+}
+
 func (t *TodoStore) findItem(id string) (index int, item Todo, err error) {
 	for index, item := range t.Items {
 		if item.ID == id {

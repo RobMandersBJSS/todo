@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"todo/todo"
+	"todo/store"
 )
 
-func ReadTodosFromFile(fileName string) ([]todo.Todo, error) {
+func ReadTodosFromFile(fileName string) ([]store.Todo, error) {
 	file, readFileError := os.Open(fileName)
 	if readFileError != nil {
 		message := fmt.Sprintf("error when reading file from %q: %v", fileName, readFileError)
@@ -23,7 +23,7 @@ func ReadTodosFromFile(fileName string) ([]todo.Todo, error) {
 		return nil, errors.New(message)
 	}
 
-	var todos []todo.Todo
+	var todos []store.Todo
 
 	unmarshalError := json.Unmarshal(bytes, &todos)
 	if unmarshalError != nil {

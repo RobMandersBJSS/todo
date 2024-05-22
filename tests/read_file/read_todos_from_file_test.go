@@ -3,13 +3,13 @@ package todos_test
 import (
 	"testing"
 	"todo/read_file"
+	"todo/store"
 	"todo/tests/helpers"
-	"todo/todo"
 )
 
 func TestReadTodosFromFile(t *testing.T) {
 	t.Run("Reads json from file and returns todos", func(t *testing.T) {
-		contents := "[{\"Item\":\"Item 1\",\"Status\":false},{\"Item\":\"Item 2\",\"Status\":true}]"
+		contents := "[{\"ID\":0,\"Item\":\"Item 1\",\"Complete\":false},{\"ID\":1,\"Item\":\"Item 2\",\"Complete\":true}]"
 
 		tempFile, closeFile := helpers.CreateTempFile(t, "todos", contents)
 		defer closeFile()
@@ -17,9 +17,9 @@ func TestReadTodosFromFile(t *testing.T) {
 		actual, err := read_file.ReadTodosFromFile(tempFile.Name())
 		helpers.AssertNoError(t, err)
 
-		expected := []todo.Todo{
-			{Item: "Item 1", Status: false},
-			{Item: "Item 2", Status: true},
+		expected := []store.Todo{
+			{ID: 0, Item: "Item 1", Complete: false},
+			{ID: 1, Item: "Item 2", Complete: true},
 		}
 
 		helpers.AssertSliceEqual(t, actual, expected)

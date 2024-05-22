@@ -13,6 +13,14 @@ func AssertEqual[T comparable](t testing.TB, actual, expected T) {
 	}
 }
 
+func AssertStructEqual[T any](t testing.TB, actual, expected T) {
+	t.Helper()
+
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("Got %+v, expected %+v", actual, expected)
+	}
+}
+
 func AssertSliceEqual[T any](t testing.TB, actual, expected []T) {
 	t.Helper()
 

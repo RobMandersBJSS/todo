@@ -5,17 +5,17 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"todo/todo"
+	"todo/store"
 )
 
-func PrintTodos(w io.Writer, todos ...todo.Todo) error {
+func PrintTodos(w io.Writer, todos ...store.Todo) error {
 	if len(todos) < 1 {
 		return errors.New("no todos provided in argument")
 	}
 
 	for _, todo := range todos {
 		status := "Incomplete"
-		if todo.Status {
+		if todo.Complete {
 			status = "Complete"
 		}
 
@@ -25,7 +25,7 @@ func PrintTodos(w io.Writer, todos ...todo.Todo) error {
 	return nil
 }
 
-func PrintTodosJSON(w io.Writer, todos ...todo.Todo) error {
+func PrintTodosJSON(w io.Writer, todos ...store.Todo) error {
 	if len(todos) < 1 {
 		return errors.New("no todos provided in argument")
 	}

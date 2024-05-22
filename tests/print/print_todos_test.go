@@ -4,16 +4,16 @@ import (
 	"bytes"
 	"testing"
 	"todo/print"
+	"todo/store"
 	"todo/tests/helpers"
-	"todo/todo"
 )
 
 func TestPrintTodos(t *testing.T) {
 	t.Run("Print todos with statuses", func(t *testing.T) {
 		buffer := &bytes.Buffer{}
-		todos := []todo.Todo{
-			{Item: "Item 1", Status: false},
-			{Item: "Item 2", Status: true},
+		todos := []store.Todo{
+			{ID: 0, Item: "Item 1", Complete: false},
+			{ID: 1, Item: "Item 2", Complete: true},
 		}
 
 		err := print.PrintTodos(buffer, todos...)
@@ -27,7 +27,7 @@ func TestPrintTodos(t *testing.T) {
 
 	t.Run("Return an error if no todos provided", func(t *testing.T) {
 		buffer := &bytes.Buffer{}
-		todos := []todo.Todo{}
+		todos := []store.Todo{}
 
 		err := print.PrintTodos(buffer, todos...)
 

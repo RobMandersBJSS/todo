@@ -4,7 +4,9 @@ import (
 	"embed"
 	"fmt"
 	"html/template"
+	"net/http"
 	"os"
+	"todo/modules/store"
 	"todo/modules/web_server"
 )
 
@@ -14,13 +16,12 @@ var (
 )
 
 func main() {
-	// todos := store.TodoStore{Items: []store.Todo{}}
-	// print.PrintTodos(os.Stdout, todos.Items...)
-
 	template := loadTemplates()
-	server := web_server.NewServer(template)
+	todoStore := store.TodoStore{Items: []store.Todo{}}
 
-	server.Start()
+	server := web_server.NewServer(template, &todoStore)
+
+	http.ListenAndServe(":5000", server)
 }
 
 func loadTemplates() *template.Template {

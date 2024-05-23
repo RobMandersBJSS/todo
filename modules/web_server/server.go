@@ -65,11 +65,19 @@ func (s *Server) webSocketHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 
+	s.executeWebsocketAction(w, messageJSON)
+}
+
+func (s *Server) executeWebsocketAction(w http.ResponseWriter, messageJSON WebSocketMessage) {
 	switch messageJSON.Action {
 	case "new":
 		s.createItem(w, messageJSON)
 	case "update":
 		s.updateItem(w, messageJSON)
+	case "toggle":
+		s.toggleItemStatus(w, messageJSON)
+	case "delete":
+		s.deleteItem(w, messageJSON)
 	default:
 		w.WriteHeader(http.StatusBadRequest)
 	}
@@ -77,7 +85,6 @@ func (s *Server) webSocketHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) createItem(w http.ResponseWriter, messageJSON WebSocketMessage) {
 	_, err := s.todoStore.Create(messageJSON.Description)
-
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {
@@ -87,6 +94,24 @@ func (s *Server) createItem(w http.ResponseWriter, messageJSON WebSocketMessage)
 
 func (s *Server) updateItem(w http.ResponseWriter, messageJSON WebSocketMessage) {
 	err := s.todoStore.UpdateItem(messageJSON.ID, messageJSON.Description)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func (s *Server) toggleItemStatus(w http.ResponseWriter, messageJSON WebSocketMessage) {
+	err := s.todoStore.ToggleItemStatus(messageJSON.ID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func (s *Server) deleteItem(w http.ResponseWriter, messageJSON WebSocketMessage) {
+	err := s.todoStore.Delete(messageJSON.ID)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	} else {

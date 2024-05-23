@@ -44,7 +44,7 @@ func TestServer(t *testing.T) {
 		approvals.VerifyString(t, response.Body.String())
 	})
 
-	t.Run("Add new event via websocket request", func(t *testing.T) {
+	t.Run("Add new item via websocket request", func(t *testing.T) {
 		todoStore := store.TodoStore{}
 		server := createTestServer(t, &todoStore)
 
@@ -62,7 +62,7 @@ func TestServer(t *testing.T) {
 		helpers.AssertEqual(t, actual, expected)
 	})
 
-	t.Run("Update event via websocket request", func(t *testing.T) {
+	t.Run("Update item via websocket request", func(t *testing.T) {
 		todoStore := store.TodoStore{
 			Items: []store.Todo{
 				{ID: "0", Description: "Todo Item", Complete: false},
@@ -82,6 +82,53 @@ func TestServer(t *testing.T) {
 		helpers.AssertNoError(t, err)
 
 		expected := store.Todo{ID: "0", Description: "Updated Item", Complete: false}
+
+		helpers.AssertStructEqual(t, actual, expected)
+	})
+
+	t.Run("Toggle item status via websocket request", func(t *testing.T) {
+		todoStore := store.TodoStore{
+			Items: []store.Todo{
+				{ID: "0", Description: "Todo Item", Complete: false},
+			},
+		}
+		server := createTestServer(t, &todoStore)
+
+		ws := createWebSocket(t, server)
+		defer ws.Close()
+
+		message := "{\"action\":\"toggle\",\"id\":\"0\"}"
+		writeWebSocketMessage(t, ws, message)
+
+		time.Sleep(10 * time.Millisecond)
+
+		actual, err := todoStore.Read("0")
+		helpers.AssertNoError(t, err)
+
+		expected := store.Todo{ID: "0", Description: "Todo Item", Complete: true}
+
+		helpers.AssertStructEqual(t, actual, expected)
+	})
+
+	t.Run("Delete item via websocket request", func(t *testing.T) {
+		todoStore := store.TodoStore{
+			Items: []store.Todo{
+				{ID: "0", Description: "Item 1", Complete: false},
+				{ID: "1", Description: "Item 2", Complete: false},
+			},
+		}
+		server := createTestServer(t, &todoStore)
+
+		ws := createWebSocket(t, server)
+		defer ws.Close()
+
+		message := "{\"action\":\"delete\",\"id\":\"0\"}"
+		writeWebSocketMessage(t, ws, message)
+
+		time.Sleep(10 * time.Millisecond)
+
+		actual := todoStore.Items
+		expected := []store.Todo{{ID: "1", Description: "Item 2", Complete: false}}
 
 		helpers.AssertStructEqual(t, actual, expected)
 	})

@@ -3,7 +3,9 @@ package main
 import (
 	"embed"
 	"fmt"
-	"net/http"
+	"html/template"
+	"os"
+	"todo/modules/web_server"
 )
 
 var (
@@ -15,13 +17,18 @@ func main() {
 	// todos := store.TodoStore{Items: []store.Todo{}}
 	// print.PrintTodos(os.Stdout, todos.Items...)
 
-	router := http.NewServeMux()
-	router.Handle("/", http.HandlerFunc(handler))
+	template := loadTemplates()
+	server := web_server.NewServer(template)
 
-	fmt.Println("Listening on port 5000...")
-	http.ListenAndServe(":5000", router)
+	server.Start()
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Test")
+func loadTemplates() *template.Template {
+	templates, err := template.ParseFS(templates, "templates/*.gohtml")
+	if err != nil {
+		fmt.Printf("Experienced the following error parsing the template: %v", err)
+		os.Exit(1)
+	}
+
+	return templates
 }

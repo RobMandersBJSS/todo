@@ -17,7 +17,10 @@ var (
 
 func main() {
 	template := loadTemplates()
-	todoStore := store.TodoStore{Items: []store.Todo{}}
+	todoStore := store.TodoStore{Items: []store.Todo{
+		{ID: "0", Description: "Item 1", Complete: false},
+		{ID: "1", Description: "Item 2", Complete: false},
+	}}
 
 	server := web_server.NewServer(template, &todoStore)
 

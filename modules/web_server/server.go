@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"todo/modules/store"
 
+	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
 )
 
@@ -24,9 +25,12 @@ type WebSocketMessage struct {
 func NewServer(template *template.Template, todoStore *store.TodoStore) *Server {
 	server := new(Server)
 
-	router := http.NewServeMux()
+	router := mux.NewRouter()
 	router.Handle("/", http.HandlerFunc(server.renderHomepage))
 	router.Handle("/ws", http.HandlerFunc(server.webSocketHandler))
+
+	fileServer := http.FileServer(http.Dir("static/"))
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))
 
 	server.Handler = router
 	server.template = template
@@ -36,7 +40,7 @@ func NewServer(template *template.Template, todoStore *store.TodoStore) *Server 
 }
 
 func (s *Server) renderHomepage(w http.ResponseWriter, r *http.Request) {
-	err := s.template.ExecuteTemplate(w, "main.gohtml", nil)
+	err := s.template.ExecuteTemplate(w, "main.gohtml", s.todoStore.Items)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}

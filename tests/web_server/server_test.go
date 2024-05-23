@@ -31,8 +31,14 @@ func TestServer(t *testing.T) {
 		helpers.AssertEqual(t, response.Code, http.StatusOK)
 	})
 
-	t.Run("GET / returns a body from a given template", func(t *testing.T) {
-		server := web_server.NewServer(createTemplate(t), &dummyStore)
+	t.Run("GET / returns a HTML document with listed todo tasks", func(t *testing.T) {
+		todoStore := store.TodoStore{
+			Items: []store.Todo{
+				{ID: "0", Description: "Item 1", Complete: false},
+				{ID: "1", Description: "Item 2", Complete: false},
+			},
+		}
+		server := web_server.NewServer(createTemplate(t), &todoStore)
 
 		request, err := http.NewRequest(http.MethodGet, "/", nil)
 		helpers.AssertNoError(t, err)
@@ -163,7 +169,14 @@ func createTestServer(t testing.TB, todoStore *store.TodoStore) *httptest.Server
 func createTemplate(t testing.TB) *template.Template {
 	t.Helper()
 
-	test_template, err := template.New("main.gohtml").Parse("<h1>Test Template</h1>")
+	template_string := `
+<h1>Test Template</h1>
+{{range $index, $item := .}}
+	<p>{{ $item.Description }}</p>
+{{end}}
+`
+
+	test_template, err := template.New("main.gohtml").Parse(template_string)
 	helpers.AssertNoError(t, err)
 
 	return test_template

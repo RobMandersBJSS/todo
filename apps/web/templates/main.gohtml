@@ -1,10 +1,5 @@
 {{template "header"}}
-<ul class="todo__items">
-    {{range $index, $item := .}}
-    <li class="todo__item" data-id="{{ $item.ID }}">
-        {{ $item.Description }} | {{ $item.Complete }}
-    </li>
-    {{end}}
-</ul>    
+
+<ul id="todo-items"></ul>    
 
 {{template "footer"}}

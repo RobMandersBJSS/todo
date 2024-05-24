@@ -1,7 +1,1 @@
-
 <h1>Test Template</h1>
-
-	<p>Item 1</p>
-
-	<p>Item 2</p>
-

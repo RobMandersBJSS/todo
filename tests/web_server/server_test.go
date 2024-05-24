@@ -32,13 +32,7 @@ func TestServer(t *testing.T) {
 	})
 
 	t.Run("GET / returns a HTML document with listed todo tasks", func(t *testing.T) {
-		todoStore := store.TodoStore{
-			Items: []store.Todo{
-				{ID: "0", Description: "Item 1", Complete: false},
-				{ID: "1", Description: "Item 2", Complete: false},
-			},
-		}
-		server := web_server.NewServer(createTemplate(t), &todoStore)
+		server := web_server.NewServer(createTemplate(t), &dummyStore)
 
 		request, err := http.NewRequest(http.MethodGet, "/", nil)
 		helpers.AssertNoError(t, err)
@@ -48,6 +42,25 @@ func TestServer(t *testing.T) {
 		server.ServeHTTP(response, request)
 
 		approvals.VerifyString(t, response.Body.String())
+	})
+
+	t.Run("Receive todo list on websocket connection", func(t *testing.T) {
+		todoStore := store.TodoStore{
+			Items: []store.Todo{
+				{ID: "0", Description: "Item 1", Complete: false},
+				{ID: "1", Description: "Item 2", Complete: true},
+			},
+		}
+		server := createTestServer(t, &todoStore)
+
+		ws := createWebSocket(t, server)
+		defer ws.Close()
+
+		_, actual, err := ws.ReadMessage()
+		helpers.AssertNoError(t, err)
+		expected := "[{\"ID\":\"0\",\"Description\":\"Item 1\",\"Complete\":false},{\"ID\":\"1\",\"Description\":\"Item 2\",\"Complete\":true}]"
+
+		helpers.AssertEqual(t, string(actual), expected)
 	})
 
 	t.Run("Add new item via websocket request", func(t *testing.T) {
@@ -119,7 +132,7 @@ func TestServer(t *testing.T) {
 	t.Run("Delete item via websocket request", func(t *testing.T) {
 		todoStore := store.TodoStore{
 			Items: []store.Todo{
-				{ID: "0", Description: "Item 1", Complete: false},
+				{ID: "0", Description: "Item 1", Complete: true},
 				{ID: "1", Description: "Item 2", Complete: false},
 			},
 		}
@@ -169,14 +182,7 @@ func createTestServer(t testing.TB, todoStore *store.TodoStore) *httptest.Server
 func createTemplate(t testing.TB) *template.Template {
 	t.Helper()
 
-	template_string := `
-<h1>Test Template</h1>
-{{range $index, $item := .}}
-	<p>{{ $item.Description }}</p>
-{{end}}
-`
-
-	test_template, err := template.New("main.gohtml").Parse(template_string)
+	test_template, err := template.New("main.gohtml").Parse("<h1>Test Template</h1>")
 	helpers.AssertNoError(t, err)
 
 	return test_template

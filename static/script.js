@@ -20,6 +20,8 @@ newTodoButton.addEventListener('click', () => {
         description: newTodoInput.value
     })
     connection.send(message)
+
+    newTodoInput.value = null
 })
 
 function renderTodos(data) {

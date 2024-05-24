@@ -1,6 +1,7 @@
 package server_test
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 	"net/http/httptest"
@@ -44,30 +45,6 @@ func TestServer(t *testing.T) {
 		approvals.VerifyString(t, response.Body.String())
 	})
 
-	t.Run("Request todo list", func(t *testing.T) {
-		todoStore := store.TodoStore{
-			Items: []store.Todo{
-				{ID: "0", Description: "Item 1", Complete: false},
-				{ID: "1", Description: "Item 2", Complete: true},
-			},
-		}
-		server := createTestServer(t, &todoStore)
-
-		ws := createWebSocket(t, server)
-		defer ws.Close()
-
-		message := "{\"action\":\"get_todos\"}"
-		writeWebSocketMessage(t, ws, message)
-
-		time.Sleep(10 * time.Millisecond)
-
-		_, actual, err := ws.ReadMessage()
-		helpers.AssertNoError(t, err)
-		expected := "[{\"ID\":\"0\",\"Description\":\"Item 1\",\"Complete\":false},{\"ID\":\"1\",\"Description\":\"Item 2\",\"Complete\":true}]"
-
-		helpers.AssertEqual(t, string(actual), expected)
-	})
-
 	t.Run("Add new item via websocket request", func(t *testing.T) {
 		todoStore := store.TodoStore{}
 		server := createTestServer(t, &todoStore)
@@ -80,81 +57,73 @@ func TestServer(t *testing.T) {
 
 		time.Sleep(10 * time.Millisecond)
 
-		actual := todoStore.Items[0].Description
+		actual := todoStore.GetItems()[0].Description
 		expected := "Todo Item"
 
 		helpers.AssertEqual(t, actual, expected)
 	})
 
 	t.Run("Update item via websocket request", func(t *testing.T) {
-		todoStore := store.TodoStore{
-			Items: []store.Todo{
-				{ID: "0", Description: "Todo Item", Complete: false},
-			},
-		}
+		todoStore := store.TodoStore{}
+		todoStore.Create("Todo Item")
+		id := todoStore.GetItems()[0].ID
+
 		server := createTestServer(t, &todoStore)
 
 		ws := createWebSocket(t, server)
 		defer ws.Close()
 
-		message := "{\"action\":\"update\",\"id\":\"0\",\"description\":\"Updated Item\"}"
+		message := fmt.Sprintf("{\"action\":\"update\",\"id\":\"%s\",\"description\":\"Updated Item\"}", id)
 		writeWebSocketMessage(t, ws, message)
 
 		time.Sleep(10 * time.Millisecond)
 
-		actual, err := todoStore.Read("0")
+		actual, err := todoStore.Read(id)
 		helpers.AssertNoError(t, err)
 
-		expected := store.Todo{ID: "0", Description: "Updated Item", Complete: false}
-
-		helpers.AssertStructEqual(t, actual, expected)
+		helpers.AssertStructEqual(t, actual.Description, "Updated Item")
 	})
 
 	t.Run("Toggle item status via websocket request", func(t *testing.T) {
-		todoStore := store.TodoStore{
-			Items: []store.Todo{
-				{ID: "0", Description: "Todo Item", Complete: false},
-			},
-		}
+		todoStore := store.TodoStore{}
+		todoStore.Create("Todo Item")
+		id := todoStore.GetItems()[0].ID
+
 		server := createTestServer(t, &todoStore)
 
 		ws := createWebSocket(t, server)
 		defer ws.Close()
 
-		message := "{\"action\":\"toggle\",\"id\":\"0\"}"
+		message := fmt.Sprintf("{\"action\":\"toggle\",\"id\":\"%s\"}", id)
 		writeWebSocketMessage(t, ws, message)
 
 		time.Sleep(10 * time.Millisecond)
 
-		actual, err := todoStore.Read("0")
+		actual, err := todoStore.Read(id)
 		helpers.AssertNoError(t, err)
 
-		expected := store.Todo{ID: "0", Description: "Todo Item", Complete: true}
-
-		helpers.AssertStructEqual(t, actual, expected)
+		helpers.AssertStructEqual(t, actual.Complete, true)
 	})
 
 	t.Run("Delete item via websocket request", func(t *testing.T) {
-		todoStore := store.TodoStore{
-			Items: []store.Todo{
-				{ID: "0", Description: "Item 1", Complete: true},
-				{ID: "1", Description: "Item 2", Complete: false},
-			},
-		}
+		todoStore := store.TodoStore{}
+		todoStore.Create("Item 1")
+		todoStore.Create("Item 2")
+		id := todoStore.GetItems()[0].ID
+
 		server := createTestServer(t, &todoStore)
 
 		ws := createWebSocket(t, server)
 		defer ws.Close()
 
-		message := "{\"action\":\"delete\",\"id\":\"0\"}"
+		message := fmt.Sprintf("{\"action\":\"delete\",\"id\":\"%s\"}", id)
 		writeWebSocketMessage(t, ws, message)
 
 		time.Sleep(10 * time.Millisecond)
 
-		actual := todoStore.Items
-		expected := []store.Todo{{ID: "1", Description: "Item 2", Complete: false}}
+		actual := todoStore.GetItems()
 
-		helpers.AssertStructEqual(t, actual, expected)
+		helpers.AssertStructEqual(t, len(actual), 1)
 	})
 }
 

@@ -3,6 +3,7 @@ package store
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/google/uuid"
 )
@@ -14,10 +15,21 @@ type Todo struct {
 }
 
 type TodoStore struct {
-	Items []Todo
+	mutex sync.Mutex
+	items []Todo
+}
+
+func (t *TodoStore) GetItems() []Todo {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
+	return t.items
 }
 
 func (t *TodoStore) Create(description string) (string, error) {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	id, err := uuid.NewV7()
 	if err != nil {
 		errorMessage := fmt.Sprintf("received the following error while creating a uuid for the new item: %v", err)
@@ -30,12 +42,15 @@ func (t *TodoStore) Create(description string) (string, error) {
 		Complete:    false,
 	}
 
-	t.Items = append(t.Items, newItem)
+	t.items = append(t.items, newItem)
 
 	return id.String(), nil
 }
 
 func (t *TodoStore) Read(id string) (Todo, error) {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	_, item, err := t.findItem(id)
 	if err != nil {
 		return Todo{}, err
@@ -44,50 +59,50 @@ func (t *TodoStore) Read(id string) (Todo, error) {
 	return item, nil
 }
 
-func (t *TodoStore) FindItemIndex(id string) (int, error) {
-	index, _, err := t.findItem(id)
-	if err != nil {
-		return -1, err
-	}
-
-	return index, nil
-}
-
 func (t *TodoStore) UpdateItem(id string, description string) error {
-	index, err := t.FindItemIndex(id)
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
+	index, err := t.findItemIndex(id)
 	if err != nil {
 		return err
 	}
 
-	t.Items[index].Description = description
+	t.items[index].Description = description
 
 	return nil
 }
 
 func (t *TodoStore) ToggleItemStatus(id string) error {
-	index, err := t.FindItemIndex(id)
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
+	index, err := t.findItemIndex(id)
 	if err != nil {
 		return err
 	}
 
-	t.Items[index].Complete = !t.Items[index].Complete
+	t.items[index].Complete = !t.items[index].Complete
 
 	return nil
 }
 
 func (t *TodoStore) Delete(id string) error {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	index, _, err := t.findItem(id)
 	if err != nil {
 		return err
 	}
 
-	t.Items = append(t.Items[:index], t.Items[index+1:]...)
+	t.items = append(t.items[:index], t.items[index+1:]...)
 
 	return nil
 }
 
 func (t *TodoStore) findItem(id string) (index int, item Todo, err error) {
-	for index, item := range t.Items {
+	for index, item := range t.items {
 		if item.ID == id {
 			return index, item, nil
 		}
@@ -95,4 +110,13 @@ func (t *TodoStore) findItem(id string) (index int, item Todo, err error) {
 
 	errorMessage := fmt.Sprintf("could not locate item with id '%s'", id)
 	return -1, Todo{}, errors.New(errorMessage)
+}
+
+func (t *TodoStore) findItemIndex(id string) (int, error) {
+	index, _, err := t.findItem(id)
+	if err != nil {
+		return -1, err
+	}
+
+	return index, nil
 }

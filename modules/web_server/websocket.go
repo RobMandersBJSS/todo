@@ -61,7 +61,8 @@ func (s *Server) executeWebsocketAction(messageJSON Action) {
 
 func (s *Server) sendTodosToClient() {
 	buffer := &bytes.Buffer{}
-	print.PrintTodosJSON(buffer, s.todoStore.Items...)
+	items := s.todoStore.GetItems()
+	print.PrintTodosJSON(buffer, items...)
 
 	err := s.connection.WriteMessage(websocket.TextMessage, buffer.Bytes())
 	if err != nil {

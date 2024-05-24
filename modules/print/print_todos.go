@@ -8,7 +8,7 @@ import (
 	"todo/modules/store"
 )
 
-const NoItemsMessage = "No items in list."
+const NoItemsMessage = "No items in list.\n"
 
 func PrintTodo(w io.Writer, item store.Todo) {
 	status := "Incomplete"

@@ -11,7 +11,7 @@ import (
 
 func main() {
 	running := true
-	todos := store.TodoStore{Items: []store.Todo{}}
+	todos := store.TodoStore{}
 	input := bufio.NewScanner(os.Stdin)
 
 	fmt.Println("Todo List App")
@@ -25,7 +25,7 @@ func main() {
 		case "help":
 			printHelpPage()
 		case "list":
-			print.PrintTodos(os.Stdout, todos.Items...)
+			print.PrintTodos(os.Stdout, todos.GetItems()...)
 		case "new":
 			newItem(&todos, inputString)
 		case "print":

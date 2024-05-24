@@ -35,7 +35,8 @@ func NewServer(template *template.Template, todoStore *store.TodoStore) *Server 
 }
 
 func (s *Server) renderHomepage(w http.ResponseWriter, r *http.Request) {
-	err := s.template.ExecuteTemplate(w, "main.gohtml", s.todoStore.Items)
+	items := s.todoStore.GetItems()
+	err := s.template.ExecuteTemplate(w, "main.gohtml", items)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}

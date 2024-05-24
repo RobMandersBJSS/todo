@@ -44,7 +44,7 @@ func TestServer(t *testing.T) {
 		approvals.VerifyString(t, response.Body.String())
 	})
 
-	t.Run("Receive todo list on websocket connection", func(t *testing.T) {
+	t.Run("Request todo list", func(t *testing.T) {
 		todoStore := store.TodoStore{
 			Items: []store.Todo{
 				{ID: "0", Description: "Item 1", Complete: false},
@@ -55,6 +55,11 @@ func TestServer(t *testing.T) {
 
 		ws := createWebSocket(t, server)
 		defer ws.Close()
+
+		message := "{\"action\":\"get_todos\"}"
+		writeWebSocketMessage(t, ws, message)
+
+		time.Sleep(10 * time.Millisecond)
 
 		_, actual, err := ws.ReadMessage()
 		helpers.AssertNoError(t, err)

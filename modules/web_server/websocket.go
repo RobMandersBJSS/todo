@@ -14,7 +14,6 @@ func (s *Server) webSocketHandler(w http.ResponseWriter, r *http.Request) {
 	s.connection = s.initialiseWebsocketConnection(w, r)
 	defer s.connection.Close()
 
-	s.sendTodosToClient()
 	s.handleWebSocketActions()
 }
 
@@ -23,9 +22,11 @@ func (s *Server) handleWebSocketActions() {
 		messageType, message, err := s.connection.ReadMessage()
 		if err != nil {
 			s.sendWebsocketErrorMessage("Message could not be read.")
+			break
 		}
 
 		if messageType == websocket.CloseMessage {
+			s.connection.Close()
 			break
 		}
 
@@ -33,15 +34,17 @@ func (s *Server) handleWebSocketActions() {
 		unmarshalError := json.Unmarshal(message, &messageJSON)
 		if unmarshalError != nil {
 			s.sendWebsocketErrorMessage("Unable to unpack JSON payload")
+			break
 		}
 
 		s.executeWebsocketAction(messageJSON)
-		s.sendTodosToClient()
 	}
 }
 
 func (s *Server) executeWebsocketAction(messageJSON Action) {
 	switch messageJSON.Action {
+	case "get_todos":
+		s.sendTodosToClient()
 	case "new":
 		s.createItem(messageJSON)
 	case "update":
@@ -51,7 +54,7 @@ func (s *Server) executeWebsocketAction(messageJSON Action) {
 	case "delete":
 		s.deleteItem(messageJSON)
 	default:
-		errorMessage := fmt.Sprintf("%s is not a valid actrion", messageJSON.Action)
+		errorMessage := fmt.Sprintf("%s is not a valid action", messageJSON.Action)
 		s.sendWebsocketErrorMessage(errorMessage)
 	}
 }
@@ -70,7 +73,7 @@ func (s *Server) sendWebsocketErrorMessage(message string) {
 	messageJSON := fmt.Sprintf("{\"error\":\"%s\"}", message)
 	err := s.connection.WriteMessage(websocket.TextMessage, []byte(messageJSON))
 	if err != nil {
-		fmt.Println("Unable to send error message to client.")
+		fmt.Printf("Unable to send error message to client: %v\n", err)
 	}
 }
 

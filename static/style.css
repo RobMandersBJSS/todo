@@ -1,3 +1,101 @@
+@font-face {
+    font-family: 'Nunito';
+    font-weight: 400;
+    src: url('/static/fonts/Nunito-Regular.ttf')
+}
+
+@font-face {
+    font-family: 'Nunito';
+    font-weight: 700;
+    src: url('/static/fonts/Nunito-Bold.ttf')
+}
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-    background-color: aquamarine;
+    background-color: #1c1f24;
+    font-family: 'Nunito', sans-serif;
+    color: #abafba;
+}
+
+main {
+    margin: 0 auto;
+    max-width: 400px;
+}
+
+.heading {
+    text-align: center;
+}
+
+#todo-items {
+    padding: 0;
+}
+
+.item {
+    display: flex;
+    background-color: #21252d;
+    width: 100%;
+    align-items: center;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.item__description {
+    flex-grow: 1;
+}
+
+.item__button {
+    cursor: pointer;
+    background: none;
+    border: none;
+    width: 48px;
+    height: 48px;
+    padding: 0;
+}
+
+.icon {
+    transform: translateY(2px);
+}
+
+.icon--check {
+    fill: #65b779;
+}
+
+.icon--circle {
+    fill: #abafba;
+}
+
+.icon--delete {
+    fill: #ae6275;
+}
+
+.form__input-container {
+    display: flex;
+    margin-top: 0.25rem;
+}
+
+.form__input {
+    flex-grow: 1;
+    background-color: #171718;
+    font-size: 1rem;
+    font-family: 'Nunito';
+    color: #abafba;
+    margin-right: 0.5rem;
+    padding: 0.75rem;
+    outline: none;
+    border: none;
+    border-radius: 4px;
+}
+
+.form__button {
+    cursor: pointer;
+    background-color: #21252d;
+    color: #abafba;
+    font-size: 1rem;
+    font-family: 'Nunito';
+    border: none;
+    border-radius: 4px;
+    padding: 0 1.25rem;
 }

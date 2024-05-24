@@ -1,5 +1,26 @@
-{{template "header"}}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+    <title>Todo List</title>
+</head>
+<body>
+    <main>
+        <h1 class="heading">Todo List</h1>
+    
+        <ul id="todo-items"></ul>    
+    
+        <div class="form">
+            <label class="form__label" for="new-todo-input">Enter Description</label>
+            <div class="form__input-container">
+                <input class="form__input" id="new-todo-input" type="text" name="new-todo-input">
+                <button class="form__button" id="new-todo-button">Create</button>
+            </div>
+        </div>
+    </main>
 
-<ul id="todo-items"></ul>    
-
-{{template "footer"}}
+    <script src="/static/script.js"></script>
+</body>
+</html>

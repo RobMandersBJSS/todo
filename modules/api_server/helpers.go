@@ -6,17 +6,20 @@ import (
 	"net/http"
 )
 
-func (a *ApiServer) sendItemAsResponse(w http.ResponseWriter, id string) {
+func (a *ApiServer) sendItemAsResponse(w http.ResponseWriter, id string, status int) {
 	item, err := a.store.Read(id)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(http.StatusNotFound)
+		return
 	}
 
 	responseJson, err := json.Marshal(item)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
+	w.WriteHeader(status)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(responseJson))
 }

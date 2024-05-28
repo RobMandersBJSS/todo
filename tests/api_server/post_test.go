@@ -16,7 +16,7 @@ func TestApiServerPOST(t *testing.T) {
 
 		requestBody := bytes.Buffer{}
 		requestBody.Write([]byte("{\"description\":\"New Item\"}"))
-		request, response := helpers.NewRequestResponse(t, http.MethodPost, "/api/", &requestBody)
+		request, response := helpers.NewRequestResponse(t, http.MethodPost, "/api", &requestBody)
 
 		server.ServeHTTP(response, request)
 
@@ -31,7 +31,7 @@ func TestApiServerPOST(t *testing.T) {
 
 		requestBody := bytes.Buffer{}
 		requestBody.Write([]byte("{\"description\":\"New Item\"}"))
-		request, response := helpers.NewRequestResponse(t, http.MethodPost, "/api/", &requestBody)
+		request, response := helpers.NewRequestResponse(t, http.MethodPost, "/api", &requestBody)
 
 		server.ServeHTTP(response, request)
 

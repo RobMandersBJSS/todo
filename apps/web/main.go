@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 	"todo/modules/store"
-	"todo/modules/web_server"
+	"todo/modules/web_app"
 )
 
 var (
@@ -23,7 +23,7 @@ func main() {
 	todoStore.Create("Walk Dog")
 	todoStore.Create("Buy Milk")
 
-	server := web_server.NewServer(template, &todoStore)
+	server := web_app.NewServer(template, &todoStore)
 
 	http.ListenAndServe(":5000", server)
 }

@@ -1,4 +1,4 @@
-package web_server
+package web_app
 
 import (
 	"html/template"

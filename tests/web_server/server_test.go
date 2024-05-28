@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 	"todo/modules/store"
-	"todo/modules/web_server"
+	"todo/modules/web_app"
 	"todo/tests/helpers"
 
 	approvals "github.com/approvals/go-approval-tests"
@@ -20,7 +20,7 @@ func TestServer(t *testing.T) {
 	var dummyStore = store.TodoStore{}
 
 	t.Run("GET / returns 200", func(t *testing.T) {
-		server := web_server.NewServer(createTemplate(t), &dummyStore)
+		server := web_app.NewServer(createTemplate(t), &dummyStore)
 
 		request, err := http.NewRequest(http.MethodGet, "/", nil)
 		helpers.AssertNoError(t, err)
@@ -33,7 +33,7 @@ func TestServer(t *testing.T) {
 	})
 
 	t.Run("GET / returns a HTML document with listed todo tasks", func(t *testing.T) {
-		server := web_server.NewServer(createTemplate(t), &dummyStore)
+		server := web_app.NewServer(createTemplate(t), &dummyStore)
 
 		request, err := http.NewRequest(http.MethodGet, "/", nil)
 		helpers.AssertNoError(t, err)
@@ -150,7 +150,7 @@ func createTestServer(t testing.TB, todoStore *store.TodoStore) *httptest.Server
 
 	template := createTemplate(t)
 
-	return httptest.NewServer(web_server.NewServer(template, todoStore))
+	return httptest.NewServer(web_app.NewServer(template, todoStore))
 }
 
 func createTemplate(t testing.TB) *template.Template {

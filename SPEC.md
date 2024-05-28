@@ -2,7 +2,7 @@
 
 [X] Use a variadic function to print a list of 10 todos.
 [X] Output a list of 10 todos in JSON format.
-[X] Use a variadic function to output 10 todos in JSON format.
+[ ] Use a variadic function to output 10 todos in JSON file.
 [X] Read todos from a JSON file.
 [X] Create console program to read 10 todos from a JSON file and display them on screen.
 [ ] Simulate a race condition... 
@@ -15,7 +15,7 @@
 # Part 2
 
 [X] Create CLI app to manage todo list stored in memory. Create, Read, Update, Delete.
-[ ] Create web page app to manage todo list stores in memory.
+[X] Create web page app to manage todo list stores in memory.
 [ ] Create server that can concurrently receive a list or pre-defined commands. The following should be avaiable via specific commands:
     [ ] Server status.
     [ ] Task status.

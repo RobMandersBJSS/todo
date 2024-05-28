@@ -5,19 +5,22 @@ import (
 	"fmt"
 	"net/http"
 	"testing"
+	"time"
 	"todo/modules/api_server"
-	"todo/modules/store"
+	"todo/modules/todo_memory_store"
 	"todo/tests/helpers"
 )
 
 func TestApiServerDELETE(t *testing.T) {
+	timeout := 10 * time.Millisecond
+
 	t.Run("DELETE /api/ deleted an item", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 		todoStore.Create("Item 1")
 		todoStore.Create("Item 2")
 		id := todoStore.GetItems()[0].ID
 
-		server := api_server.NewApiServer(&todoStore)
+		server := api_server.NewApiServer(&todoStore, timeout)
 
 		requestBody := bytes.Buffer{}
 		requestBody.Write([]byte(fmt.Sprintf("{\"id\":\"%s\"}", id)))
@@ -32,11 +35,11 @@ func TestApiServerDELETE(t *testing.T) {
 	})
 
 	t.Run("DELETE /api returns 404 if item does not exist", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 		todoStore.Create("Item 1")
 		todoStore.Create("Item 2")
 
-		server := api_server.NewApiServer(&todoStore)
+		server := api_server.NewApiServer(&todoStore, timeout)
 
 		requestBody := bytes.Buffer{}
 		requestBody.Write([]byte("{\"id\":\"xyz\"}"))

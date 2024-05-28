@@ -24,7 +24,7 @@ func (a *ApiServer) sendItemAsResponse(w http.ResponseWriter, id string, status 
 	w.Write([]byte(responseJson))
 }
 
-func unpackRequest(w http.ResponseWriter, r *http.Request) RequestBody {
+func unpackRequest(w http.ResponseWriter, r *http.Request) requestBody {
 	defer r.Body.Close()
 
 	bytes, err := io.ReadAll(r.Body)
@@ -32,7 +32,7 @@ func unpackRequest(w http.ResponseWriter, r *http.Request) RequestBody {
 		w.WriteHeader(http.StatusBadRequest)
 	}
 
-	var contents RequestBody
+	var contents requestBody
 	if err := json.Unmarshal(bytes, &contents); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 	}

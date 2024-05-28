@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"testing"
 	"todo/modules/print"
-	"todo/modules/store"
+	"todo/modules/todo_store"
 	"todo/tests/helpers"
 )
 
 func TestPrintTodosJSON(t *testing.T) {
 	t.Run("Print todos in JSON format", func(t *testing.T) {
 		buffer := &bytes.Buffer{}
-		todos := []store.Todo{
+		todos := []todo_store.Todo{
 			{ID: "0", Description: "Item 1", Complete: false},
 			{ID: "1", Description: "Item 2", Complete: true},
 		}
@@ -27,7 +27,7 @@ func TestPrintTodosJSON(t *testing.T) {
 
 	t.Run("Return an error if no todos provided", func(t *testing.T) {
 		buffer := &bytes.Buffer{}
-		todos := []store.Todo{}
+		todos := []todo_store.Todo{}
 
 		err := print.PrintTodosJSON(buffer, todos...)
 

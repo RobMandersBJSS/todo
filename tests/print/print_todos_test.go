@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"testing"
 	"todo/modules/print"
-	"todo/modules/store"
+	"todo/modules/todo_store"
 	"todo/tests/helpers"
 )
 
 func TestPrintTodo(t *testing.T) {
 	t.Run("Print single todo item", func(t *testing.T) {
 		buffer := &bytes.Buffer{}
-		item := store.Todo{ID: "0", Description: "Item 1", Complete: false}
+		item := todo_store.Todo{ID: "0", Description: "Item 1", Complete: false}
 
 		print.PrintTodo(buffer, item)
 
@@ -25,7 +25,7 @@ func TestPrintTodo(t *testing.T) {
 func TestPrintTodos(t *testing.T) {
 	t.Run("Print todos with statuses", func(t *testing.T) {
 		buffer := &bytes.Buffer{}
-		todos := []store.Todo{
+		todos := []todo_store.Todo{
 			{ID: "0", Description: "Item 1", Complete: false},
 			{ID: "1", Description: "Item 2", Complete: true},
 		}
@@ -41,7 +41,7 @@ func TestPrintTodos(t *testing.T) {
 
 	t.Run("Print a message if there are no items to display", func(t *testing.T) {
 		buffer := &bytes.Buffer{}
-		todos := []store.Todo{}
+		todos := []todo_store.Todo{}
 
 		err := print.PrintTodos(buffer, todos...)
 		helpers.AssertNoError(t, err)

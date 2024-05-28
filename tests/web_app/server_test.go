@@ -1,4 +1,4 @@
-package server_test
+package web_app_test
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 	"time"
-	"todo/modules/store"
+	"todo/modules/todo_memory_store"
 	"todo/modules/web_app"
 	"todo/tests/helpers"
 
@@ -17,7 +17,7 @@ import (
 )
 
 func TestServer(t *testing.T) {
-	var dummyStore = store.TodoStore{}
+	var dummyStore = todo_memory_store.TodoStore{}
 
 	t.Run("GET / returns 200", func(t *testing.T) {
 		server := web_app.NewServer(createTemplate(t), &dummyStore)
@@ -46,7 +46,7 @@ func TestServer(t *testing.T) {
 	})
 
 	t.Run("Add new item via websocket request", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 		server := createTestServer(t, &todoStore)
 
 		ws := createWebSocket(t, server)
@@ -64,7 +64,7 @@ func TestServer(t *testing.T) {
 	})
 
 	t.Run("Update item via websocket request", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 		todoStore.Create("Todo Item")
 		id := todoStore.GetItems()[0].ID
 
@@ -85,7 +85,7 @@ func TestServer(t *testing.T) {
 	})
 
 	t.Run("Toggle item status via websocket request", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 		todoStore.Create("Todo Item")
 		id := todoStore.GetItems()[0].ID
 
@@ -106,7 +106,7 @@ func TestServer(t *testing.T) {
 	})
 
 	t.Run("Delete item via websocket request", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 		todoStore.Create("Item 1")
 		todoStore.Create("Item 2")
 		id := todoStore.GetItems()[0].ID
@@ -145,7 +145,7 @@ func createWebSocket(t *testing.T, server *httptest.Server) *websocket.Conn {
 	return ws
 }
 
-func createTestServer(t testing.TB, todoStore *store.TodoStore) *httptest.Server {
+func createTestServer(t testing.TB, todoStore *todo_memory_store.TodoStore) *httptest.Server {
 	t.Helper()
 
 	template := createTemplate(t)

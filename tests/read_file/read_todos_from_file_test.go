@@ -3,7 +3,7 @@ package todos_test
 import (
 	"testing"
 	"todo/modules/read_file"
-	"todo/modules/store"
+	"todo/modules/todo_store"
 	"todo/tests/helpers"
 )
 
@@ -17,7 +17,7 @@ func TestReadTodosFromFile(t *testing.T) {
 		actual, err := read_file.ReadTodosFromFile(tempFile.Name())
 		helpers.AssertNoError(t, err)
 
-		expected := []store.Todo{
+		expected := []todo_store.Todo{
 			{ID: "0", Description: "Item 1", Complete: false},
 			{ID: "1", Description: "Item 2", Complete: true},
 		}

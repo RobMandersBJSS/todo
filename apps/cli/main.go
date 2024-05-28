@@ -6,12 +6,12 @@ import (
 	"os"
 	"strings"
 	"todo/modules/print"
-	"todo/modules/store"
+	"todo/modules/todo_memory_store"
 )
 
 func main() {
 	running := true
-	todos := store.TodoStore{}
+	todos := todo_memory_store.TodoStore{}
 	input := bufio.NewScanner(os.Stdin)
 
 	fmt.Println("Todo List App")
@@ -44,7 +44,7 @@ func main() {
 	}
 }
 
-func newItem(todos *store.TodoStore, inputString string) {
+func newItem(todos *todo_memory_store.TodoStore, inputString string) {
 	description := inputString[3:]
 
 	id, err := todos.Create(description)
@@ -56,12 +56,12 @@ func newItem(todos *store.TodoStore, inputString string) {
 	}
 }
 
-func printItem(todos *store.TodoStore, inputString string) {
+func printItem(todos *todo_memory_store.TodoStore, inputString string) {
 	id := inputString[6:]
 	printItemWithID(todos, id)
 }
 
-func deleteItem(todos *store.TodoStore, inputString string) {
+func deleteItem(todos *todo_memory_store.TodoStore, inputString string) {
 	id := inputString[7:]
 	err := todos.Delete(id)
 	if err != nil {
@@ -71,7 +71,7 @@ func deleteItem(todos *store.TodoStore, inputString string) {
 	}
 }
 
-func updateItem(todos *store.TodoStore, inputString string) {
+func updateItem(todos *todo_memory_store.TodoStore, inputString string) {
 	id := strings.Split(inputString, " ")[1]
 	description := inputString[7+len(id):]
 
@@ -84,7 +84,7 @@ func updateItem(todos *store.TodoStore, inputString string) {
 	}
 }
 
-func updateStatus(todos *store.TodoStore, inputString string) {
+func updateStatus(todos *todo_memory_store.TodoStore, inputString string) {
 	id := inputString[7:]
 	err := todos.ToggleItemStatus(id)
 	if err != nil {
@@ -95,7 +95,7 @@ func updateStatus(todos *store.TodoStore, inputString string) {
 	}
 }
 
-func printItemWithID(todos *store.TodoStore, id string) {
+func printItemWithID(todos *todo_memory_store.TodoStore, id string) {
 	item, err := todos.Read(id)
 	if err != nil {
 		fmt.Println(err)

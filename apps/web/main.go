@@ -6,7 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"os"
-	"todo/modules/store"
+	"todo/modules/todo_memory_store"
 	"todo/modules/web_app"
 )
 
@@ -17,7 +17,7 @@ var (
 
 func main() {
 	template := loadTemplates()
-	todoStore := store.TodoStore{}
+	todoStore := todo_memory_store.TodoStore{}
 
 	todoStore.Create("Do Laundry")
 	todoStore.Create("Walk Dog")

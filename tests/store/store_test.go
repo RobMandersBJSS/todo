@@ -2,14 +2,15 @@ package store_test
 
 import (
 	"testing"
-	"todo/modules/store"
+	"todo/modules/todo_memory_store"
+	"todo/modules/todo_store"
 	"todo/tests/helpers"
 )
 
 func TestCreateItem(t *testing.T) {
 	t.Run("Create new todo item", func(t *testing.T) {
-		// item := store.Todo{ID: "", Description: "New Description", Complete: false}
-		todoStore := store.TodoStore{}
+		// item := todo_memory_store.Todo{ID: "", Description: "New Description", Complete: false}
+		todoStore := todo_memory_store.TodoStore{}
 
 		_, err := todoStore.Create("New Description")
 		helpers.AssertNoError(t, err)
@@ -22,7 +23,7 @@ func TestCreateItem(t *testing.T) {
 	})
 
 	t.Run("Create todo returns the ID", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 
 		id, err := todoStore.Create("New Description")
 		helpers.AssertNoError(t, err)
@@ -36,7 +37,7 @@ func TestCreateItem(t *testing.T) {
 
 func TestReadItem(t *testing.T) {
 	t.Run("Read todo item", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 
 		todoStore.Create("Description 1")
 		todoStore.Create("Description 2")
@@ -52,7 +53,7 @@ func TestReadItem(t *testing.T) {
 	})
 
 	t.Run("Return an error if the ID cannot be found", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 
 		todoStore.Create("Description 1")
 		todoStore.Create("Description 2")
@@ -64,7 +65,7 @@ func TestReadItem(t *testing.T) {
 
 func TestUpdateItem(t *testing.T) {
 	t.Run("Update an existing todo item", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 
 		todoStore.Create("Description 1")
 		todoStore.Create("Description 2")
@@ -83,7 +84,7 @@ func TestUpdateItem(t *testing.T) {
 	})
 
 	t.Run("Return an error if the ID cannot be found", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 
 		todoStore.Create("Description 1")
 		todoStore.Create("Description 2")
@@ -95,7 +96,7 @@ func TestUpdateItem(t *testing.T) {
 
 func TestToggleItemStatus(t *testing.T) {
 	t.Run("Toggle item completed status", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 
 		todoStore.Create("Description 1")
 		todoStore.Create("Description 2")
@@ -111,7 +112,7 @@ func TestToggleItemStatus(t *testing.T) {
 	})
 
 	t.Run("Return an error if ID cannot be found", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 
 		todoStore.Create("Description 1")
 		todoStore.Create("Description 2")
@@ -123,7 +124,7 @@ func TestToggleItemStatus(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	t.Run("Delete item", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 
 		todoStore.Create("Description 1")
 		todoStore.Create("Description 2")
@@ -133,7 +134,7 @@ func TestDelete(t *testing.T) {
 		err := todoStore.Delete(id)
 		helpers.AssertNoError(t, err)
 
-		expected := []store.Todo{
+		expected := []todo_store.Todo{
 			{ID: "1", Description: "Description 2", Complete: true},
 		}
 
@@ -141,7 +142,7 @@ func TestDelete(t *testing.T) {
 	})
 
 	t.Run("Return an error if ID cannot be found", func(t *testing.T) {
-		todoStore := store.TodoStore{}
+		todoStore := todo_memory_store.TodoStore{}
 
 		todoStore.Create("Description 1")
 		todoStore.Create("Description 2")

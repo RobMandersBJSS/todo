@@ -3,7 +3,7 @@ package web_app
 import (
 	"html/template"
 	"net/http"
-	"todo/modules/store"
+	"todo/modules/todo_store"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
@@ -11,12 +11,12 @@ import (
 
 type Server struct {
 	http.Handler
-	template   *template.Template
-	todoStore  *store.TodoStore
 	connection *websocket.Conn
+	todoStore  todo_store.TodoStore
+	template   *template.Template
 }
 
-func NewServer(template *template.Template, todoStore *store.TodoStore) *Server {
+func NewServer(template *template.Template, todoStore todo_store.TodoStore) *Server {
 	server := new(Server)
 
 	router := mux.NewRouter()
@@ -27,9 +27,9 @@ func NewServer(template *template.Template, todoStore *store.TodoStore) *Server 
 	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fileServer))
 
 	server.Handler = router
+	server.connection = &websocket.Conn{}
 	server.template = template
 	server.todoStore = todoStore
-	server.connection = &websocket.Conn{}
 
 	return server
 }

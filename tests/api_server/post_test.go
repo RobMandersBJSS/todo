@@ -14,7 +14,7 @@ import (
 func TestApiServerPOST(t *testing.T) {
 	timeout := 10 * time.Millisecond
 
-	t.Run("POST /api/ returns 201 and creates a new item", func(t *testing.T) {
+	t.Run("POST /api returns 201 and creates a new item", func(t *testing.T) {
 		todoStore := todo_memory_store.TodoStore{}
 		server := api_server.NewApiServer(&todoStore, timeout)
 
@@ -29,7 +29,7 @@ func TestApiServerPOST(t *testing.T) {
 		helpers.AssertEqual(t, todoStore.GetItems()[0].Description, "New Item")
 	})
 
-	t.Run("POST /api/ returns the new item", func(t *testing.T) {
+	t.Run("POST /api returns the new item", func(t *testing.T) {
 		todoStore := todo_memory_store.TodoStore{}
 		server := api_server.NewApiServer(&todoStore, timeout)
 
@@ -42,5 +42,29 @@ func TestApiServerPOST(t *testing.T) {
 		actual := helpers.UnmarshalBody[todo_store.Todo](t, response.Body.Bytes())
 
 		helpers.AssertEqual(t, actual.Description, "New Item")
+	})
+
+	t.Run("POST /api times out", func(t *testing.T) {
+		spyStore := helpers.SpyStore{}
+		server := api_server.NewApiServer(&spyStore, timeout)
+
+		requestBody := bytes.Buffer{}
+		requestBody.Write([]byte("{\"description\":\"New Item\"}"))
+		request, response := helpers.NewRequestResponse(t, http.MethodPost, "/api", &requestBody)
+
+		server.ServeHTTP(response, request)
+
+		helpers.AssertEqual(t, response.Code, http.StatusRequestTimeout)
+	})
+
+	t.Run("POST /api returns 400 if no body is provided", func(t *testing.T) {
+		todoStore := todo_memory_store.TodoStore{}
+		server := api_server.NewApiServer(&todoStore, timeout)
+
+		request, response := helpers.NewRequestResponse(t, http.MethodPost, "/api", nil)
+
+		server.ServeHTTP(response, request)
+
+		helpers.AssertEqual(t, response.Code, http.StatusBadRequest)
 	})
 }

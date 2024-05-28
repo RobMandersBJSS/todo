@@ -1,13 +1,19 @@
 package api_server
 
-import "net/http"
-
-type requestBody struct {
-	ID          string `json:"id"`
-	Description string `json:"description"`
-}
+import (
+	"context"
+	"net/http"
+)
 
 func (a *ApiServer) patchItemDescription(w http.ResponseWriter, r *http.Request) {
+	ctx, cancelCtx := context.WithTimeout(r.Context(), a.timeout)
+	defer cancelCtx()
+
+	if r.Body == nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	request := unpackRequest(w, r)
 
 	err := a.store.UpdateItem(request.ID, request.Description)
@@ -16,10 +22,25 @@ func (a *ApiServer) patchItemDescription(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	a.sendItemAsResponse(w, request.ID, http.StatusOK)
+	select {
+	case <-ctx.Done():
+		cancelCtx()
+		w.WriteHeader(http.StatusRequestTimeout)
+	default:
+		a.sendItemAsResponse(ctx, w, request.ID, http.StatusOK)
+	}
+
 }
 
 func (a *ApiServer) patchItemStatus(w http.ResponseWriter, r *http.Request) {
+	ctx, cancelCtx := context.WithTimeout(r.Context(), a.timeout)
+	defer cancelCtx()
+
+	if r.Body == nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	request := unpackRequest(w, r)
 
 	err := a.store.ToggleItemStatus(request.ID)
@@ -28,5 +49,11 @@ func (a *ApiServer) patchItemStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.sendItemAsResponse(w, request.ID, http.StatusOK)
+	select {
+	case <-ctx.Done():
+		cancelCtx()
+		w.WriteHeader(http.StatusRequestTimeout)
+	default:
+		a.sendItemAsResponse(ctx, w, request.ID, http.StatusOK)
+	}
 }

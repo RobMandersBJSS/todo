@@ -33,6 +33,17 @@ func TestApiServerGET(t *testing.T) {
 		helpers.AssertEqual(t, actual[1].Description, "Item 2")
 	})
 
+	t.Run("GET /api times out", func(t *testing.T) {
+		spyStore := helpers.SpyStore{}
+		server := api_server.NewApiServer(&spyStore, timeout)
+
+		request, response := helpers.NewRequestResponse(t, http.MethodGet, "/api", nil)
+
+		server.ServeHTTP(response, request)
+
+		helpers.AssertEqual(t, response.Code, http.StatusRequestTimeout)
+	})
+
 	t.Run("GET /api returns 404 if there are no items", func(t *testing.T) {
 		todoStore := todo_memory_store.TodoStore{}
 		server := api_server.NewApiServer(&todoStore, timeout)
@@ -75,11 +86,11 @@ func TestApiServerGET(t *testing.T) {
 		helpers.AssertEqual(t, response.Code, http.StatusNotFound)
 	})
 
-	t.Run("GET request times out after set time", func(t *testing.T) {
+	t.Run("GET /api/{id} times out", func(t *testing.T) {
 		spyStore := helpers.SpyStore{}
 		server := api_server.NewApiServer(&spyStore, timeout)
 
-		request, response := helpers.NewRequestResponse(t, http.MethodGet, "/api", nil)
+		request, response := helpers.NewRequestResponse(t, http.MethodGet, "/api/xyz", nil)
 
 		server.ServeHTTP(response, request)
 

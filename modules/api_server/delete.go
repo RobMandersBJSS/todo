@@ -1,8 +1,19 @@
 package api_server
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+)
 
 func (a *ApiServer) deleteItem(w http.ResponseWriter, r *http.Request) {
+	ctx, cancelCtx := context.WithTimeout(r.Context(), a.timeout)
+	defer cancelCtx()
+
+	if r.Body == nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	request := unpackRequest(w, r)
 
 	err := a.store.Delete(request.ID)
@@ -11,5 +22,11 @@ func (a *ApiServer) deleteItem(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	select {
+	case <-ctx.Done():
+		cancelCtx()
+		w.WriteHeader(http.StatusRequestTimeout)
+	default:
+		w.WriteHeader(http.StatusOK)
+	}
 }

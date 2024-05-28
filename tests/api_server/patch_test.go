@@ -67,6 +67,30 @@ func TestApiServerPATCH(t *testing.T) {
 		helpers.AssertEqual(t, actual.Description, "Updated Item")
 	})
 
+	t.Run("PATCH /api/update times out", func(t *testing.T) {
+		spyStore := helpers.SpyStore{}
+		server := api_server.NewApiServer(&spyStore, timeout)
+
+		requestBody := bytes.Buffer{}
+		requestBody.Write([]byte("{\"id\":\"xyz\",\"description\":\"Updated Item\"}"))
+		request, response := helpers.NewRequestResponse(t, http.MethodPatch, "/api/update", &requestBody)
+
+		server.ServeHTTP(response, request)
+
+		helpers.AssertEqual(t, response.Code, http.StatusRequestTimeout)
+	})
+
+	t.Run("PATCH /api/update returns 400 if no body is provided", func(t *testing.T) {
+		todoStore := todo_memory_store.TodoStore{}
+		server := api_server.NewApiServer(&todoStore, timeout)
+
+		request, response := helpers.NewRequestResponse(t, http.MethodPatch, "/api/update", nil)
+
+		server.ServeHTTP(response, request)
+
+		helpers.AssertEqual(t, response.Code, http.StatusBadRequest)
+	})
+
 	t.Run("PATCH /api/toggle changes the item completion status", func(t *testing.T) {
 		todoStore := todo_memory_store.TodoStore{}
 		todoStore.Create("Item 1")
@@ -118,5 +142,29 @@ func TestApiServerPATCH(t *testing.T) {
 		server.ServeHTTP(response, request)
 
 		helpers.AssertEqual(t, response.Code, http.StatusNotFound)
+	})
+
+	t.Run("PATCH /api/toggle times out", func(t *testing.T) {
+		spyStore := helpers.SpyStore{}
+		server := api_server.NewApiServer(&spyStore, timeout)
+
+		requestBody := bytes.Buffer{}
+		requestBody.Write([]byte("{\"id\":\"xyz\",\"description\":\"Updated Item\"}"))
+		request, response := helpers.NewRequestResponse(t, http.MethodPatch, "/api/update", &requestBody)
+
+		server.ServeHTTP(response, request)
+
+		helpers.AssertEqual(t, response.Code, http.StatusRequestTimeout)
+	})
+
+	t.Run("PATCH /api/toggle returns 400 if no body is provided", func(t *testing.T) {
+		todoStore := todo_memory_store.TodoStore{}
+		server := api_server.NewApiServer(&todoStore, timeout)
+
+		request, response := helpers.NewRequestResponse(t, http.MethodPatch, "/api/update", nil)
+
+		server.ServeHTTP(response, request)
+
+		helpers.AssertEqual(t, response.Code, http.StatusBadRequest)
 	})
 }

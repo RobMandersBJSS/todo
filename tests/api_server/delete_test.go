@@ -49,4 +49,28 @@ func TestApiServerDELETE(t *testing.T) {
 
 		helpers.AssertEqual(t, response.Code, http.StatusNotFound)
 	})
+
+	t.Run("DELETE /api times out", func(t *testing.T) {
+		spyStore := helpers.SpyStore{}
+		server := api_server.NewApiServer(&spyStore, timeout)
+
+		requestBody := bytes.Buffer{}
+		requestBody.Write([]byte("{\"id\":\"xyz\"}"))
+		request, response := helpers.NewRequestResponse(t, http.MethodDelete, "/api", &requestBody)
+
+		server.ServeHTTP(response, request)
+
+		helpers.AssertEqual(t, response.Code, http.StatusRequestTimeout)
+	})
+
+	t.Run("DELETE /api returns 400 if no body is provided", func(t *testing.T) {
+		todoStore := todo_memory_store.TodoStore{}
+		server := api_server.NewApiServer(&todoStore, timeout)
+
+		request, response := helpers.NewRequestResponse(t, http.MethodDelete, "/api", nil)
+
+		server.ServeHTTP(response, request)
+
+		helpers.AssertEqual(t, response.Code, http.StatusBadRequest)
+	})
 }

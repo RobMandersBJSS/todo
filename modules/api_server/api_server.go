@@ -6,12 +6,18 @@ import (
 	"todo/modules/todo_store"
 )
 
-type ApiServer struct {
-	http.Handler
-	store todo_store.TodoStore
+type requestBody struct {
+	ID          string `json:"id"`
+	Description string `json:"description"`
 }
 
-func NewApiServer(store todo_store.TodoStore, timout time.Duration) *ApiServer {
+type ApiServer struct {
+	store   todo_store.TodoStore
+	timeout time.Duration
+	http.Handler
+}
+
+func NewApiServer(store todo_store.TodoStore, timeout time.Duration) *ApiServer {
 	server := new(ApiServer)
 
 	router := http.NewServeMux()
@@ -22,8 +28,9 @@ func NewApiServer(store todo_store.TodoStore, timout time.Duration) *ApiServer {
 	router.Handle("PATCH /api/toggle", http.HandlerFunc(server.patchItemStatus))
 	router.Handle("DELETE /api", http.HandlerFunc(server.deleteItem))
 
-	server.Handler = router
 	server.store = store
+	server.timeout = timeout
+	server.Handler = router
 
 	return server
 }

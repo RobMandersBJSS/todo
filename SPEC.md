@@ -2,7 +2,7 @@
 
 [X] Use a variadic function to print a list of 10 todos.
 [X] Output a list of 10 todos in JSON format.
-[ ] Use a variadic function to output 10 todos in JSON file.
+[X] Use a variadic function to output 10 todos in JSON file.
 [X] Read todos from a JSON file.
 [X] Create console program to read 10 todos from a JSON file and display them on screen.
 [ ] Simulate a race condition... 

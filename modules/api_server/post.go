@@ -9,30 +9,35 @@ func (a *ApiServer) postItem(w http.ResponseWriter, r *http.Request) {
 	ctx, cancelCtx := context.WithTimeout(r.Context(), a.timeout)
 	defer cancelCtx()
 
-	channel := make(chan string)
+	ok := make(chan string)
+	fail := make(chan int)
 
 	go func() {
+		defer close(ok)
+		defer close(fail)
+
 		if r.Body == nil {
-			w.WriteHeader(http.StatusBadRequest)
+			fail <- http.StatusBadRequest
 			return
 		}
 		request := unpackRequest(w, r)
 
 		id, err := a.store.Create(request.Description)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			fail <- http.StatusInternalServerError
+			return
 		}
 
-		channel <- id
-		close(channel)
+		ok <- id
 	}()
 
 	select {
 	case <-ctx.Done():
 		cancelCtx()
 		w.WriteHeader(http.StatusRequestTimeout)
-	case id := <-channel:
+	case id := <-ok:
 		a.sendItemAsResponse(ctx, w, id, http.StatusCreated)
+	case status := <-fail:
+		w.WriteHeader(status)
 	}
-
 }

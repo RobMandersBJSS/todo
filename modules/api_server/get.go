@@ -4,39 +4,45 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"todo/modules/todo_store"
 )
 
 func (a *ApiServer) getAllItems(w http.ResponseWriter, r *http.Request) {
 	ctx, cancelCtx := context.WithTimeout(r.Context(), a.timeout)
 	defer cancelCtx()
 
-	channel := make(chan []todo_store.Todo)
+	ok := make(chan []byte)
+	fail := make(chan int)
 
 	go func() {
-		channel <- a.store.GetItems()
-		close(channel)
+		defer close(ok)
+		defer close(fail)
+
+		items := a.store.GetItems()
+
+		if len(items) == 0 {
+			fail <- http.StatusNotFound
+			return
+		}
+
+		responseJson, err := json.Marshal(items)
+		if err != nil {
+			fail <- http.StatusInternalServerError
+			return
+		}
+
+		ok <- responseJson
 	}()
 
 	select {
 	case <-ctx.Done():
 		cancelCtx()
 		w.WriteHeader(http.StatusRequestTimeout)
-	case items := <-channel:
-		if len(items) == 0 {
-			w.WriteHeader(http.StatusNotFound)
-			return
-		}
-
-		responseJson, err := json.Marshal(items)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
+	case responseJson := <-ok:
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(responseJson))
+	case status := <-fail:
+		w.WriteHeader(status)
 	}
 }
 

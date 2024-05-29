@@ -6,6 +6,11 @@ import (
 	"todo/modules/todo_store"
 )
 
+type result struct {
+	id     string
+	status int
+}
+
 type requestBody struct {
 	ID          string `json:"id"`
 	Description string `json:"description"`

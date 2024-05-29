@@ -9,11 +9,11 @@ func (a *ApiServer) deleteItem(w http.ResponseWriter, r *http.Request) {
 	ctx, cancelCtx := context.WithTimeout(r.Context(), a.timeout)
 	defer cancelCtx()
 
-	channel := make(chan bool)
+	channel := make(chan int)
 
 	go func() {
 		if r.Body == nil {
-			w.WriteHeader(http.StatusBadRequest)
+			channel <- http.StatusBadRequest
 			return
 		}
 
@@ -21,11 +21,11 @@ func (a *ApiServer) deleteItem(w http.ResponseWriter, r *http.Request) {
 
 		err := a.store.Delete(request.ID)
 		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
+			channel <- http.StatusNotFound
 			return
 		}
 
-		channel <- true
+		channel <- http.StatusOK
 		close(channel)
 	}()
 
@@ -33,7 +33,7 @@ func (a *ApiServer) deleteItem(w http.ResponseWriter, r *http.Request) {
 	case <-ctx.Done():
 		cancelCtx()
 		w.WriteHeader(http.StatusRequestTimeout)
-	case <-channel:
-		w.WriteHeader(http.StatusOK)
+	case status := <-channel:
+		w.WriteHeader(status)
 	}
 }

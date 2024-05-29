@@ -9,11 +9,15 @@ func (a *ApiServer) patchItemDescription(w http.ResponseWriter, r *http.Request)
 	ctx, cancelCtx := context.WithTimeout(r.Context(), a.timeout)
 	defer cancelCtx()
 
-	channel := make(chan string)
+	ok := make(chan string)
+	fail := make(chan int)
 
 	go func() {
+		defer close(ok)
+		defer close(fail)
+
 		if r.Body == nil {
-			w.WriteHeader(http.StatusBadRequest)
+			fail <- http.StatusBadRequest
 			return
 		}
 
@@ -21,45 +25,58 @@ func (a *ApiServer) patchItemDescription(w http.ResponseWriter, r *http.Request)
 
 		err := a.store.UpdateItem(request.ID, request.Description)
 		if err != nil {
-			w.WriteHeader(http.StatusNotFound)
+			fail <- http.StatusNotFound
 			return
 		}
 
-		channel <- request.ID
+		ok <- request.ID
 	}()
 
 	select {
 	case <-ctx.Done():
 		cancelCtx()
 		w.WriteHeader(http.StatusRequestTimeout)
-	case id := <-channel:
+	case id := <-ok:
 		a.sendItemAsResponse(ctx, w, id, http.StatusOK)
+	case status := <-fail:
+		w.WriteHeader(status)
 	}
-
 }
 
 func (a *ApiServer) patchItemStatus(w http.ResponseWriter, r *http.Request) {
 	ctx, cancelCtx := context.WithTimeout(r.Context(), a.timeout)
 	defer cancelCtx()
 
-	if r.Body == nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	ok := make(chan string)
+	fail := make(chan int)
 
-	request := unpackRequest(w, r)
+	go func() {
+		defer close(ok)
+		defer close(fail)
 
-	err := a.store.ToggleItemStatus(request.ID)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
+		if r.Body == nil {
+			fail <- http.StatusBadRequest
+			return
+		}
+
+		request := unpackRequest(w, r)
+
+		err := a.store.ToggleItemStatus(request.ID)
+		if err != nil {
+			fail <- http.StatusNotFound
+			return
+		}
+
+		ok <- request.ID
+	}()
 
 	select {
 	case <-ctx.Done():
 		cancelCtx()
 		w.WriteHeader(http.StatusRequestTimeout)
-	default:
-		a.sendItemAsResponse(ctx, w, request.ID, http.StatusOK)
+	case id := <-ok:
+		a.sendItemAsResponse(ctx, w, id, http.StatusOK)
+	case status := <-fail:
+		w.WriteHeader(status)
 	}
 }

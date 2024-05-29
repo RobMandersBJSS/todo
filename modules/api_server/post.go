@@ -9,22 +9,29 @@ func (a *ApiServer) postItem(w http.ResponseWriter, r *http.Request) {
 	ctx, cancelCtx := context.WithTimeout(r.Context(), a.timeout)
 	defer cancelCtx()
 
-	if r.Body == nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-	request := unpackRequest(w, r)
+	channel := make(chan string)
 
-	id, err := a.store.Create(request.Description)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	}
+	go func() {
+		if r.Body == nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		request := unpackRequest(w, r)
+
+		id, err := a.store.Create(request.Description)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+		}
+
+		channel <- id
+		close(channel)
+	}()
 
 	select {
 	case <-ctx.Done():
 		cancelCtx()
 		w.WriteHeader(http.StatusRequestTimeout)
-	default:
+	case id := <-channel:
 		a.sendItemAsResponse(ctx, w, id, http.StatusCreated)
 	}
 

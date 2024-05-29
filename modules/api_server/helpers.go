@@ -11,23 +11,30 @@ func (a *ApiServer) sendItemAsResponse(ctx context.Context, w http.ResponseWrite
 	ctx, cancelCtx := context.WithCancel(ctx)
 	defer cancelCtx()
 
-	item, err := a.store.Read(id)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
+	channel := make(chan []byte)
 
-	select {
-	case <-ctx.Done():
-		cancelCtx()
-		w.WriteHeader(http.StatusRequestTimeout)
-	default:
+	go func() {
+		item, err := a.store.Read(id)
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
 		responseJson, err := json.Marshal(item)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
 
+		channel <- responseJson
+		close(channel)
+	}()
+
+	select {
+	case <-ctx.Done():
+		cancelCtx()
+		w.WriteHeader(http.StatusRequestTimeout)
+	case responseJson := <-channel:
 		w.WriteHeader(status)
 		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(responseJson))

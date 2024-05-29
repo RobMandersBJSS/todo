@@ -4,19 +4,25 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"todo/modules/todo_store"
 )
 
 func (a *ApiServer) getAllItems(w http.ResponseWriter, r *http.Request) {
 	ctx, cancelCtx := context.WithTimeout(r.Context(), a.timeout)
 	defer cancelCtx()
 
-	items := a.store.GetItems()
+	channel := make(chan []todo_store.Todo)
+
+	go func() {
+		channel <- a.store.GetItems()
+		close(channel)
+	}()
 
 	select {
 	case <-ctx.Done():
 		cancelCtx()
 		w.WriteHeader(http.StatusRequestTimeout)
-	default:
+	case items := <-channel:
 		if len(items) == 0 {
 			w.WriteHeader(http.StatusNotFound)
 			return

@@ -9,25 +9,31 @@ func (a *ApiServer) patchItemDescription(w http.ResponseWriter, r *http.Request)
 	ctx, cancelCtx := context.WithTimeout(r.Context(), a.timeout)
 	defer cancelCtx()
 
-	if r.Body == nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	channel := make(chan string)
 
-	request := unpackRequest(w, r)
+	go func() {
+		if r.Body == nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
 
-	err := a.store.UpdateItem(request.ID, request.Description)
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		return
-	}
+		request := unpackRequest(w, r)
+
+		err := a.store.UpdateItem(request.ID, request.Description)
+		if err != nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		channel <- request.ID
+	}()
 
 	select {
 	case <-ctx.Done():
 		cancelCtx()
 		w.WriteHeader(http.StatusRequestTimeout)
-	default:
-		a.sendItemAsResponse(ctx, w, request.ID, http.StatusOK)
+	case id := <-channel:
+		a.sendItemAsResponse(ctx, w, id, http.StatusOK)
 	}
 
 }

@@ -5,11 +5,11 @@
 [X] Use a variadic function to output 10 todos in JSON file.
 [X] Read todos from a JSON file.
 [X] Create console program to read 10 todos from a JSON file and display them on screen.
-[ ] Simulate a race condition... 
-    [ ] When one Goroutine updates a variable with odd numbers.
-    [ ] And another Goroutine updates the variable with even numbers.
-    [ ] Then after each update, attempt to display the variable.
-[ ] Refactor program to use channels and mutexes.
+[X] Simulate a race condition... 
+    [X] When one Goroutine updates a variable with odd numbers.
+    [X] And another Goroutine updates the variable with even numbers.
+    [X] Then after each update, attempt to display the variable.
+[X] Refactor program to use channels and mutexes.
 [ ] Print a list of todos and their current status, using two goroutines which alternate between items and statuses.
 
 # Part 2
@@ -19,7 +19,7 @@
 [ ] Create server that can concurrently receive a list or pre-defined commands. The following should be avaiable via specific commands:
     [ ] Server status.
     [ ] Task status.
-[ ] Create a web API to receive web page actions (remote commands) applied to todo list.
+[X] Create a web API to receive web page actions (remote commands) applied to todo list.
 
 # Stretch Goals
 

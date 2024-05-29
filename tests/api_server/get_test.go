@@ -96,4 +96,51 @@ func TestApiServerGET(t *testing.T) {
 
 		helpers.AssertEqual(t, response.Code, http.StatusRequestTimeout)
 	})
+
+	t.Run("GET /api/status/{id} returns completion status of a task", func(t *testing.T) {
+		todoStore := todo_memory_store.TodoStore{}
+		todoStore.Create("Item 1")
+		todoStore.Create("Item 2")
+
+		server := api_server.NewApiServer(&todoStore, timeout)
+
+		id := todoStore.GetItems()[0].ID
+		todoStore.ToggleItemStatus(id)
+
+		url := fmt.Sprintf("/api/status/%s", id)
+		request, response := helpers.NewRequestResponse(t, http.MethodGet, url, nil)
+
+		server.ServeHTTP(response, request)
+
+		helpers.AssertEqual(t, response.Code, http.StatusOK)
+
+		actual := helpers.UnmarshalBody[api_server.ItemStatus](t, response.Body.Bytes()).Completed
+		expected := true
+
+		helpers.AssertEqual(t, actual, expected)
+	})
+
+	t.Run("GET /api/status/{id} returns 404 if item does not exist", func(t *testing.T) {
+		todoStore := todo_memory_store.TodoStore{}
+		todoStore.Create("Item 1")
+
+		server := api_server.NewApiServer(&todoStore, timeout)
+
+		request, response := helpers.NewRequestResponse(t, http.MethodGet, "/api/status/xyz", nil)
+
+		server.ServeHTTP(response, request)
+
+		helpers.AssertEqual(t, response.Code, http.StatusNotFound)
+	})
+
+	t.Run("GET /api/status/{id} times out", func(t *testing.T) {
+		spyStore := helpers.SpyStore{}
+		server := api_server.NewApiServer(&spyStore, timeout)
+
+		request, response := helpers.NewRequestResponse(t, http.MethodGet, "/api/status/xyz", nil)
+
+		server.ServeHTTP(response, request)
+
+		helpers.AssertEqual(t, response.Code, http.StatusRequestTimeout)
+	})
 }

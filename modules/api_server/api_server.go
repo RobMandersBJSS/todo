@@ -6,11 +6,6 @@ import (
 	"todo/modules/todo_store"
 )
 
-type result struct {
-	id     string
-	status int
-}
-
 type requestBody struct {
 	ID          string `json:"id"`
 	Description string `json:"description"`
@@ -26,8 +21,10 @@ func NewApiServer(store todo_store.TodoStore, timeout time.Duration) *ApiServer 
 	server := new(ApiServer)
 
 	router := http.NewServeMux()
+	router.Handle("GET /status", http.HandlerFunc(server.getServerStatus))
 	router.Handle("GET /api", http.HandlerFunc(server.getAllItems))
 	router.Handle("GET /api/{id}", http.HandlerFunc(server.getItem))
+	router.Handle("GET /api/status/{id}", http.HandlerFunc(server.getItemStatus))
 	router.Handle("POST /api", http.HandlerFunc(server.postItem))
 	router.Handle("PATCH /api/update", http.HandlerFunc(server.patchItemDescription))
 	router.Handle("PATCH /api/toggle", http.HandlerFunc(server.patchItemStatus))

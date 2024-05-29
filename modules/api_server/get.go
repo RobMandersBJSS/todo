@@ -54,3 +54,47 @@ func (a *ApiServer) getItem(w http.ResponseWriter, r *http.Request) {
 
 	a.sendItemAsResponse(ctx, w, id, http.StatusOK)
 }
+
+type ItemStatus struct {
+	Completed bool `json:"completed"`
+}
+
+func (a *ApiServer) getItemStatus(w http.ResponseWriter, r *http.Request) {
+	ctx, cancelCtx := context.WithTimeout(r.Context(), a.timeout)
+	defer cancelCtx()
+
+	ok := make(chan []byte)
+	fail := make(chan int)
+
+	go func() {
+		defer close(ok)
+		defer close(fail)
+
+		item, err := a.store.Read(r.PathValue("id"))
+		if err != nil {
+			fail <- http.StatusNotFound
+			return
+		}
+
+		response := ItemStatus{item.Complete}
+		responseJson, err := json.Marshal(response)
+		if err != nil {
+			fail <- http.StatusInternalServerError
+			return
+		}
+
+		ok <- responseJson
+	}()
+
+	select {
+	case <-ctx.Done():
+		cancelCtx()
+		w.WriteHeader(http.StatusRequestTimeout)
+	case responseJson := <-ok:
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(responseJson))
+	case status := <-fail:
+		w.WriteHeader(status)
+	}
+}

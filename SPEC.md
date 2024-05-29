@@ -16,9 +16,9 @@
 
 [X] Create CLI app to manage todo list stored in memory. Create, Read, Update, Delete.
 [X] Create web page app to manage todo list stores in memory.
-[ ] Create server that can concurrently receive a list or pre-defined commands. The following should be avaiable via specific commands:
-    [ ] Server status.
-    [ ] Task status.
+[X] Create server that can concurrently receive a list of pre-defined commands. The following should be avaiable via specific commands:
+    [X] Server status.
+    [X] Task status.
 [X] Create a web API to receive web page actions (remote commands) applied to todo list.
 
 # Stretch Goals

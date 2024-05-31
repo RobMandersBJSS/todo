@@ -10,7 +10,7 @@
     [X] And another Goroutine updates the variable with even numbers.
     [X] Then after each update, attempt to display the variable.
 [X] Refactor program to use channels and mutexes.
-[ ] Print a list of todos and their current status, using two goroutines which alternate between items and statuses.
+[X] Print a list of todos and their current status, using two goroutines which alternate between items and statuses.
 
 # Part 2
 

@@ -2,6 +2,8 @@ package helpers
 
 import (
 	"os"
+	"path/filepath"
+	"runtime"
 	"testing"
 )
 
@@ -35,4 +37,11 @@ func CreateTempDirectory(t testing.TB) (string, func()) {
 	}
 
 	return dir, removeDir
+}
+
+func GetRootDir() string {
+	_, basePath, _, _ := runtime.Caller(0)
+	rootDir := filepath.Join(filepath.Dir(basePath), "../..")
+
+	return rootDir
 }

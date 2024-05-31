@@ -1,4 +1,4 @@
-package store_test
+package todo_memory_store_test
 
 import (
 	"testing"
